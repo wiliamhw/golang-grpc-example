@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+package greet;
+option go_package="github.com/frain8/grpc-go-coure/greet/greetpb";
+
+service GreetService{}
