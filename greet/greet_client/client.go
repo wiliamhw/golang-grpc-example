@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/frain8/grpc-go-course/greet/greetpb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 	"io"
 	"log"
 	"time"
@@ -36,7 +38,9 @@ func main() {
 	//doUnary(c)
 	//doServerStreaming(c)
 	//doClientStreaming(c)
-	doBiDiStreaming(c)
+	//doBiDiStreaming(c)
+	doUnaryWithDeadline(c, 5*time.Second) // should complete
+	doUnaryWithDeadline(c, 1*time.Second) // should timeout
 }
 
 func doUnary(c greetpb.GreetServiceClient) {
@@ -186,4 +190,33 @@ func doBiDiStreaming(c greetpb.GreetServiceClient) {
 		}
 		fmt.Printf("Received: %v\n", res.GetResult())
 	}
+}
+
+func doUnaryWithDeadline(c greetpb.GreetServiceClient, timeout time.Duration) {
+	log.Println("Starting to do a UnaryWithDeadline RPC...")
+	req := &greetpb.GreetWithDeadlineRequest{
+		Greeting: &greetpb.Greeting{
+			FirstName: "Stephane",
+			LastName:  "Marek",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	res, err := c.GreetWithDeadline(ctx, req)
+	if err != nil {
+		statusErr, ok := status.FromError(err)
+
+		// Golang/framework error
+		if !ok {
+			log.Fatalf("Big Error while calling SquareRoot RPC: %v", err)
+		}
+
+		// gRPC error
+		if statusErr.Code() == codes.DeadlineExceeded {
+			log.Fatalf("Timeout was hit! Deadline was exceeded")
+		}
+		log.Fatalf("Unexpected gRPC error: %v\n", statusErr)
+	}
+	log.Printf("Response from Greet: %v", res.Result)
 }

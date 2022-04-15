@@ -161,12 +161,12 @@ func doErrorCall(c calculatorpb.CalculatorServiceClient, number int32) {
 	if err != nil {
 		respErr, ok := status.FromError(err)
 
-		// Default error
+		// Golang/framework error
 		if !ok {
 			log.Fatalf("Big Error while calling SquareRoot RPC: %v", err)
 		}
 
-		// Custom error
+		// gRPC error
 		fmt.Printf("Error message from server: %v\n", respErr.Message())
 		fmt.Println(respErr.Code())
 		if respErr.Code() == codes.InvalidArgument {
