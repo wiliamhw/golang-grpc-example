@@ -66,13 +66,13 @@ func doServerStreaming(c greetpb.GreetServiceClient) {
 		log.Fatalf("Error while calling Greet Server Streaming RPC: %v", err)
 	}
 	for {
-		msg, err := resStream.Recv()
+		res, err := resStream.Recv()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			log.Fatalf("Errpr while reading stream %v", err)
+			log.Fatalf("Error while reading stream %v", err)
 		}
-		log.Printf("Response from GreetManyTimes: %v", msg.GetResult())
+		log.Printf("Response from GreetManyTimes: %v", res.GetResult())
 	}
 }
