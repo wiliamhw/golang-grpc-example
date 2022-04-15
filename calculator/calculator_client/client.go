@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"io"
 	"log"
+	"time"
 )
 
 const serverPort = 50051
@@ -33,7 +34,8 @@ func main() {
 	//fmt.Printf("Created client: %f\n", c)
 
 	doUnary(c)
-	doServerStreaming(c)
+	//doServerStreaming(c)
+	doClientStreaming(c)
 }
 
 func doUnary(c calculatorpb.CalculatorServiceClient) {
@@ -69,4 +71,33 @@ func doServerStreaming(c calculatorpb.CalculatorServiceClient) {
 		}
 		log.Printf("Response from PrimeNumberDecomposition: %v", res.GetPrimeNumber())
 	}
+}
+
+func doClientStreaming(c calculatorpb.CalculatorServiceClient) {
+	fmt.Println("Starting to do a Client Streaming RPC...")
+
+	stream, err := c.ComputeAverage(context.Background())
+	if err != nil {
+		log.Fatalf("Error while calling ComputeAverage: %v", err)
+	}
+
+	numbers := [...]int32{3, 5, 9, 54, 23}
+
+	for _, number := range numbers {
+		fmt.Printf("Sending number: %v\n", number)
+		req := &calculatorpb.ComputeAverageRequest{
+			Number: number,
+		}
+		err := stream.Send(req)
+		if err != nil {
+			fmt.Printf("Error on sending request: %v\n", err)
+		}
+		time.Sleep(1000 * time.Millisecond)
+	}
+
+	res, err := stream.CloseAndRecv()
+	if err != nil {
+		log.Fatalf("Error while receiving response from ComputeAverage: %v", err)
+	}
+	fmt.Printf("The average is: %v\n", res.GetAverage())
 }
