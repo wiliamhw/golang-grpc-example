@@ -44,6 +44,7 @@ func (*server) PrimeNumberDecomposition(
 		}
 		err := stream.Send(res)
 		if err != nil {
+			log.Printf("Erorr while sending data to client: %v\n", err)
 			return err
 		}
 		number /= divisor
@@ -63,7 +64,8 @@ func (*server) ComputeAverage(stream calculatorpb.CalculatorService_ComputeAvera
 			break // Finish reading the client stream
 		}
 		if err != nil {
-			log.Fatalf("Error while reading client stream: %v", err)
+			log.Printf("Erorr while reading client stream: %v", err)
+			return err
 		}
 		number := req.GetNumber()
 		sum += number
@@ -73,6 +75,9 @@ func (*server) ComputeAverage(stream calculatorpb.CalculatorService_ComputeAvera
 	err := stream.SendAndClose(&calculatorpb.ComputeAverageResponse{
 		Average: average,
 	})
+	if err != nil {
+		log.Printf("Erorr while sending data to client: %v\n", err)
+	}
 	return err
 }
 
