@@ -19,8 +19,10 @@ type server struct {
 	greetpb.UnimplementedGreetServiceServer
 }
 
-const port = 50051
-const tls = true
+const (
+	port = 50051
+	tls  = true
+)
 
 func (*server) Greet(ctx context.Context, req *greetpb.GreetRequest) (*greetpb.GreetResponse, error) {
 	fmt.Printf("Greet function was invoked with %v\n", req)

@@ -14,8 +14,10 @@ import (
 	"time"
 )
 
-const serverPort = 50051
-const tls = true
+const (
+	serverPort = 50051
+	tls        = true
+)
 
 func main() {
 	fmt.Println("Hello, I'm a client")
