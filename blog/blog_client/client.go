@@ -29,11 +29,13 @@ func main() {
 	c := blogpb.NewBlogServiceClient(cc)
 
 	blog := createBlog(c)
+	readBlog(c, "1dfsoijfs")
 	readBlog(c, blog.GetId())
+	updateBlog(c, blog.GetId())
 }
 
 func createBlog(c blogpb.BlogServiceClient) *blogpb.Blog {
-	fmt.Println("Creating the blog")
+	fmt.Println("\nCreating the blog")
 	blog := &blogpb.Blog{
 		AuthorId: "Stephane",
 		Title:    "My First Blog",
@@ -48,21 +50,31 @@ func createBlog(c blogpb.BlogServiceClient) *blogpb.Blog {
 }
 
 func readBlog(c blogpb.BlogServiceClient, blogId string) {
-	fmt.Println("Reading the blog")
+	fmt.Printf("\nReading the blog with id: %v\n", blogId)
 
-	requests := [...]*blogpb.ReadBlogRequest{
-		{
-			BlogId: "1dfsoijfs",
-		}, {
-			BlogId: blogId,
-		},
+	req := &blogpb.ReadBlogRequest{
+		BlogId: blogId,
 	}
 
-	for _, req := range requests {
-		res, err := c.ReadBlog(context.Background(), req)
-		if err != nil {
-			fmt.Printf("Error happened while reading: %v", err)
-		}
-		fmt.Printf("Blog was read: %v\n", res)
+	res, err := c.ReadBlog(context.Background(), req)
+	if err != nil {
+		fmt.Printf("Error happened while reading: %v", err)
 	}
+	fmt.Printf("Blog was read: %v\n", res)
+}
+
+func updateBlog(c blogpb.BlogServiceClient, blogId string) *blogpb.Blog {
+	fmt.Println("\nUpdating the blog")
+	newBlog := &blogpb.Blog{
+		Id:       blogId,
+		AuthorId: "ChangeAuthor",
+		Title:    "title-test",
+		Content:  "content-test",
+	}
+	res, err := c.UpdateBlog(context.Background(), &blogpb.UpdateBlogRequest{Blog: newBlog})
+	if err != nil {
+		log.Fatalf("Unexpected error: %v", err)
+	}
+	fmt.Printf("Blog has been updated: %v\n", res)
+	return res.GetBlog()
 }
