@@ -10,4 +10,14 @@ message Blog {
   string content = 4;
 }
 
-service BlogService {}
+message CreateBlogRequest {
+  Blog blog = 1;
+}
+
+message CreteBlogResponse{
+  Blog blog = 1; // will have a blog id
+}
+
+service BlogService {
+  rpc CreateBlog(CreateBlogRequest) returns (CreteBlogResponse);
+}
