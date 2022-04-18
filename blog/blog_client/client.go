@@ -6,6 +6,7 @@ import (
 	"github.com/wiliamhw/golang-grpc-example/blog/blogpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"io"
 	"log"
 )
 
@@ -33,6 +34,7 @@ func main() {
 	readBlog(c, blog.GetId())
 	updateBlog(c, blog.GetId())
 	deleteBlog(c, blog.GetId())
+	listBlog(c)
 }
 
 func createBlog(c blogpb.BlogServiceClient) *blogpb.Blog {
@@ -92,4 +94,23 @@ func deleteBlog(c blogpb.BlogServiceClient, blogId string) {
 		fmt.Printf("Error happened while deleting: %v\n", err)
 	}
 	fmt.Printf("Blog was deleted: %v\n", res)
+}
+
+func listBlog(c blogpb.BlogServiceClient) {
+	fmt.Println("\nListing all blogs")
+
+	stream, err := c.ListBlog(context.Background(), &blogpb.ListBlogRequest{})
+	if err != nil {
+		log.Fatalf("Error while calling ListBlog Streaming RPC: %v", err)
+	}
+	for {
+		res, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalf("Error while reading stream %v", err)
+		}
+		fmt.Printf("Response from ListBlog: %v", res.GetBlog())
+	}
 }

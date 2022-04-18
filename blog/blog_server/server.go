@@ -166,6 +166,46 @@ func (*server) DeleteBlog(ctx context.Context, req *blogpb.DeleteBlogRequest) (
 	}, nil
 }
 
+func (*server) ListBlog(
+	req *blogpb.ListBlogRequest,
+	stream blogpb.BlogService_ListBlogServer,
+) error {
+	fmt.Println("List blog request")
+
+	cur, err := collection.Find(context.Background(), bson.D{})
+	if err != nil {
+		return status.Errorf(
+			codes.Internal,
+			fmt.Sprintf("Unknown internal error: %v", err),
+		)
+	}
+	defer func(cur *mongo.Cursor, ctx context.Context) {
+		if err := cur.Close(ctx); err != nil {
+			log.Printf("Failed to close MongoDB cursor: %v\n", err)
+		}
+	}(cur, context.Background())
+
+	for cur.Next(context.Background()) {
+		data := &blogItem{}
+		if err := cur.Decode(data); err != nil {
+			return status.Errorf(
+				codes.Internal,
+				fmt.Sprintf("Error while decoding data from MongoDB: %v", err),
+			)
+		}
+		if err := stream.Send(&blogpb.ListBlogResponse{Blog: dataToBlogPb(data)}); err != nil {
+			log.Printf("Cannot send blog %v to stream", data.ID)
+		}
+	}
+	if err := cur.Err(); err != nil {
+		return status.Errorf(
+			codes.Internal,
+			fmt.Sprintf("Unknown internal error: %v", err),
+		)
+	}
+	return nil
+}
+
 func dataToBlogPb(data *blogItem) *blogpb.Blog {
 	return &blogpb.Blog{
 		Id:       data.ID.Hex(),
