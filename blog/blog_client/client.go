@@ -32,6 +32,7 @@ func main() {
 	readBlog(c, "1dfsoijfs")
 	readBlog(c, blog.GetId())
 	updateBlog(c, blog.GetId())
+	deleteBlog(c, blog.GetId())
 }
 
 func createBlog(c blogpb.BlogServiceClient) *blogpb.Blog {
@@ -58,7 +59,7 @@ func readBlog(c blogpb.BlogServiceClient, blogId string) {
 
 	res, err := c.ReadBlog(context.Background(), req)
 	if err != nil {
-		fmt.Printf("Error happened while reading: %v", err)
+		fmt.Printf("Error happened while reading: %v\n", err)
 	}
 	fmt.Printf("Blog was read: %v\n", res)
 }
@@ -77,4 +78,18 @@ func updateBlog(c blogpb.BlogServiceClient, blogId string) *blogpb.Blog {
 	}
 	fmt.Printf("Blog has been updated: %v\n", res)
 	return res.GetBlog()
+}
+
+func deleteBlog(c blogpb.BlogServiceClient, blogId string) {
+	fmt.Printf("\nDeleting the blog with id: %v\n", blogId)
+
+	req := &blogpb.DeleteBlogRequest{
+		BlogId: blogId,
+	}
+
+	res, err := c.DeleteBlog(context.Background(), req)
+	if err != nil {
+		fmt.Printf("Error happened while deleting: %v\n", err)
+	}
+	fmt.Printf("Blog was deleted: %v\n", res)
 }
