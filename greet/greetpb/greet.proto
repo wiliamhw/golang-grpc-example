@@ -50,17 +50,17 @@ message GreetWithDeadlineResponse {
 
 service GreetService{
   // Unary
-  rpc Greet(GreetRequest) returns (GreetResponse) {};
+  rpc Greet (GreetRequest) returns (GreetResponse) {};
 
   // Server Streaming
-  rpc GreetManyTimes(GreetManyTimesRequest) returns (stream GreetManyTimesResponse) {};
+  rpc GreetManyTimes (GreetManyTimesRequest) returns (stream GreetManyTimesResponse) {};
 
   // Client Streaming
-  rpc LongGreet(stream LongGreetRequest) returns (LongGreetResponse) {};
+  rpc LongGreet (stream LongGreetRequest) returns (LongGreetResponse) {};
 
   // Bi Directional (BiDi) Streaming
   rpc GreetEveryone (stream GreetEveryoneRequest) returns (stream GreetEveryoneResponse) {};
 
   // Unary With Deadline
-  rpc GreetWithDeadline(GreetWithDeadlineRequest) returns (GreetWithDeadlineResponse) {};
+  rpc GreetWithDeadline (GreetWithDeadlineRequest) returns (GreetWithDeadlineResponse) {};
 }
