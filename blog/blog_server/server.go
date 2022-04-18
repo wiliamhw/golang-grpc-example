@@ -37,6 +37,7 @@ func (*server) CreateBlog(
 	req *blogpb.CreateBlogRequest,
 ) (*blogpb.CreteBlogResponse, error) {
 
+	fmt.Println("Create blog request")
 	blog := req.GetBlog()
 	data := blogItem{
 		AuthorID: blog.GetAuthorId(),
