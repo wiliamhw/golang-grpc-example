@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 	"log"
 	"net"
@@ -153,11 +154,17 @@ func (*server) DeleteBlog(ctx context.Context, req *blogpb.DeleteBlogRequest) (
 	// Create an empty struct
 	filter := bson.M{"_id": oid}
 
-	_, deleteErr := collection.DeleteOne(context.Background(), filter)
+	res, deleteErr := collection.DeleteOne(context.Background(), filter)
 	if deleteErr != nil {
 		return nil, status.Errorf(
 			codes.Internal,
 			fmt.Sprintf("Cannot delete object in MongoDB: %v", deleteErr),
+		)
+	}
+	if res.DeletedCount == 0 {
+		return nil, status.Errorf(
+			codes.NotFound,
+			fmt.Sprintf("Blog not found: %v", blogId),
 		)
 	}
 
@@ -240,6 +247,9 @@ func main() {
 
 	s := grpc.NewServer()
 	blogpb.RegisterBlogServiceServer(s, &server{})
+
+	// Register reflection service on gRPC server.
+	reflection.Register(s)
 
 	go func() {
 		fmt.Println("Starting Server...")
