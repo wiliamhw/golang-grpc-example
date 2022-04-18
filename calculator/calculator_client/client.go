@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/frain8/grpc-go-course/calculator/calculatorpb"
+	"github.com/wiliamhw/golang-grpc-example/calculator/calculatorpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
@@ -35,10 +35,10 @@ func main() {
 	c := calculatorpb.NewCalculatorServiceClient(cc)
 	//fmt.Printf("Created client: %f\n", c)
 
-	//doUnary(c)
-	//doServerStreaming(c)
-	//doClientStreaming(c)
-	//doBiDiStreaming(c)
+	doUnary(c)
+	doServerStreaming(c)
+	doClientStreaming(c)
+	doBiDiStreaming(c)
 	doErrorUnary(c)
 }
 

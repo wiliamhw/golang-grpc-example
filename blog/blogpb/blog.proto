@@ -1,0 +1,4 @@
+syntax = "proto3";
+
+package blog;
+option go_package="github.com/wiliamhw/golang-grpc-example/blog/blogpb";

@@ -1,4 +1,4 @@
-module github.com/frain8/grpc-go-course
+module github.com/wiliamhw/golang-grpc-example
 
 go 1.18
 
